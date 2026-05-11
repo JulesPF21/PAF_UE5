@@ -3,6 +3,9 @@
 
 #include "CppDeathZone.h"
 
+#include "Animation/AnimInstanceProxy.h"
+#include "Chaos/Capsule.h"
+#include "Chaos/DebugDrawCommand.h"
 #include "GameFramework/Character.h"
 
 // Sets default values
@@ -55,12 +58,31 @@ void ACppDeathZone::OnConstruction(const FTransform& Transform)
 	}
 }
 
+void ACppDeathZone::Timer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Avant la pause"));
+
+	AActor* LocalTarget = TargetActor; // capture
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle,
+		[this, LocalTarget]()
+		{
+			Respawn(TargetActor);
+		},
+		2.0f,
+		false
+	);
+}
 
 void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
-		_sleep(2);
-		OtherActor->SetActorLocation(RespawnCapsule->GetComponentLocation());
+		TargetActor = OtherActor;
+		Timer();
 	}
+}
+void ACppDeathZone::Respawn(AActor* OtherActor)
+{
+	OtherActor->SetActorLocation(RespawnCapsule->GetComponentLocation());
 }

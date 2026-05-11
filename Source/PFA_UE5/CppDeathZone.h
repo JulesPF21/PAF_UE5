@@ -29,6 +29,16 @@ protected:
 	UBoxComponent* DeathZoneBox;
 	UPROPERTY(EditAnywhere, Category="Components")
 	UCapsuleComponent* RespawnCapsule;
+	UPROPERTY(EditAnywhere, Category="Components")
+	AActor* TargetActor;
+
+	UFUNCTION(BlueprintCallable, Category="Action")
+	void Timer();
+
+	UFUNCTION(BlueprintCallable, Category="Action")
+	void Respawn(AActor* OtherActor);
+	
+	FTimerHandle TimerHandle;
 
 public:	
 	// Called every frame
