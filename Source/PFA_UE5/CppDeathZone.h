@@ -35,7 +35,8 @@ protected:
 	APlayerCameraManager* PlayerCameraManager;
 	UPROPERTY(EditAnywhere, Category="Components")
 	APlayerController* PlayerController;
-
+	UPROPERTY(EditAnywhere, Category="Components")
+	bool canDie;
 	UFUNCTION(BlueprintCallable, Category="Action")
 	void Timer();
 

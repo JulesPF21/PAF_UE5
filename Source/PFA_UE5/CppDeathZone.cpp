@@ -34,7 +34,7 @@ ACppDeathZone::ACppDeathZone()
 void ACppDeathZone::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	canDie = true;
 	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 }
@@ -63,23 +63,27 @@ void ACppDeathZone::OnConstruction(const FTransform& Transform)
 
 void ACppDeathZone::Timer()
 {
-	AActor* LocalTarget = TargetActor; // capture
-	GetWorld()->GetTimerManager().SetTimer(
-		TimerHandle,
-		[this, LocalTarget]()
-		{
-			Respawn(TargetActor);
-		},
-		2.0f,
-		false
-	);
+	{
+		canDie = false;
+		AActor* LocalTarget = TargetActor; // capture
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			[this, LocalTarget]()
+			{
+				Respawn(TargetActor);
+			},
+			2.0f,
+			false
+		);
+	}
 }
 
 void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA(ACharacter::StaticClass()))
+	if (OtherActor->IsA(ACharacter::StaticClass())&&canDie)
 	{
-		DisableInput(PlayerController);
+		canDie = true;
+		OtherActor->DisableInput(PlayerController);
 		PlayerCameraManager->StartCameraFade(
 			0.0f,
 			1.0f,
@@ -103,5 +107,6 @@ void ACppDeathZone::Respawn(AActor* OtherActor)
 		true);
 	
 	OtherActor->SetActorLocation(RespawnCapsule->GetComponentLocation());
-	EnableInput(PlayerController);
+	OtherActor->EnableInput(PlayerController);
+	canDie = true;
 }
