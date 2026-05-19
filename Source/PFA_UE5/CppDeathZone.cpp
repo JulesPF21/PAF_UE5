@@ -7,6 +7,7 @@
 #include "Chaos/Capsule.h"
 #include "Chaos/DebugDrawCommand.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACppDeathZone::ACppDeathZone()
@@ -34,6 +35,8 @@ void ACppDeathZone::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 }
 
 // Called every frame
@@ -60,8 +63,6 @@ void ACppDeathZone::OnConstruction(const FTransform& Transform)
 
 void ACppDeathZone::Timer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Avant la pause"));
-
 	AActor* LocalTarget = TargetActor; // capture
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle,
@@ -78,11 +79,29 @@ void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AA
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()))
 	{
+		DisableInput(PlayerController);
+		PlayerCameraManager->StartCameraFade(
+			0.0f,
+			1.0f,
+			0.5f,
+			FColor::Black,
+			true,
+			true);
+		
 		TargetActor = OtherActor;
 		Timer();
 	}
 }
 void ACppDeathZone::Respawn(AActor* OtherActor)
 {
+	PlayerCameraManager->StartCameraFade(
+		1.0f,
+		0.0f,
+		1.5f,
+		FColor::Black,
+		true,
+		true);
+	
 	OtherActor->SetActorLocation(RespawnCapsule->GetComponentLocation());
+	EnableInput(PlayerController);
 }

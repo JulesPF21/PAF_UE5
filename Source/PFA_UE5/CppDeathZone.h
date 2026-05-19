@@ -31,6 +31,10 @@ protected:
 	UCapsuleComponent* RespawnCapsule;
 	UPROPERTY(EditAnywhere, Category="Components")
 	AActor* TargetActor;
+	UPROPERTY(EditAnywhere, Category="Components")
+	APlayerCameraManager* PlayerCameraManager;
+	UPROPERTY(EditAnywhere, Category="Components")
+	APlayerController* PlayerController;
 
 	UFUNCTION(BlueprintCallable, Category="Action")
 	void Timer();
