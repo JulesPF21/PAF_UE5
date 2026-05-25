@@ -61,16 +61,20 @@ void ACppDeathZone::OnConstruction(const FTransform& Transform)
 	}
 }
 
-void ACppDeathZone::Timer()
+void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (OtherActor->IsA(ACharacter::StaticClass()) && canDie)
 	{
-		canDie = false;
-		AActor* LocalTarget = TargetActor; // capture
+		canDie = false; 
+
+		OtherActor->DisableInput(PlayerController);
+		PlayerCameraManager->StartCameraFade(0.0f, 1.0f, 0.5f, FColor::Black, true, true);
+		
 		GetWorld()->GetTimerManager().SetTimer(
 			TimerHandle,
-			[this, LocalTarget]()
+			[this, OtherActor]() 
 			{
-				Respawn(TargetActor);
+				Respawn(OtherActor);
 			},
 			2.0f,
 			false
@@ -78,35 +82,14 @@ void ACppDeathZone::Timer()
 	}
 }
 
-void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->IsA(ACharacter::StaticClass())&&canDie)
-	{
-		canDie = true;
-		OtherActor->DisableInput(PlayerController);
-		PlayerCameraManager->StartCameraFade(
-			0.0f,
-			1.0f,
-			0.5f,
-			FColor::Black,
-			true,
-			true);
-		
-		TargetActor = OtherActor;
-		Timer();
-	}
-}
 void ACppDeathZone::Respawn(AActor* OtherActor)
 {
-	PlayerCameraManager->StartCameraFade(
-		1.0f,
-		0.0f,
-		1.5f,
-		FColor::Black,
-		true,
-		true);
-	
+	if (!IsValid(OtherActor)) return;
+
+	PlayerCameraManager->StartCameraFade(1.0f, 0.0f, 1.5f, FColor::Black, true, true);
+
 	OtherActor->SetActorLocation(RespawnCapsule->GetComponentLocation());
 	OtherActor->EnableInput(PlayerController);
-	canDie = true;
+    
+	canDie = true; 
 }
