@@ -37,8 +37,6 @@ protected:
 	APlayerController* PlayerController;
 	UPROPERTY(EditAnywhere, Category="Components")
 	bool canDie;
-	UFUNCTION(BlueprintCallable, Category="Action")
-	void Timer();
 
 	UFUNCTION(BlueprintCallable, Category="Action")
 	void Respawn(AActor* OtherActor);
