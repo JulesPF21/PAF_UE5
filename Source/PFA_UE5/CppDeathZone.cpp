@@ -65,6 +65,7 @@ void ACppDeathZone::OnDeathZoneOverlap(UPrimitiveComponent* OverlapComponent, AA
 {
 	if (OtherActor->IsA(ACharacter::StaticClass()) && canDie)
 	{
+
 		canDie = false; 
 
 		OtherActor->DisableInput(PlayerController);
